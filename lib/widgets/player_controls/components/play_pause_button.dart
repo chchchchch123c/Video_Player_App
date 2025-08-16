@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-
 class PlayPauseButton extends StatelessWidget {
   final VideoPlayerController controller;
   final bool isVideoEnded;
@@ -14,42 +13,39 @@ class PlayPauseButton extends StatelessWidget {
     required this.controller,
     required this.isVideoEnded,
     required this.onReplayPressed,
-});
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Icon(Icons.skip_previous),
-          GestureDetector(
-            onTap: () {
-                if (isVideoEnded) {
-                  onReplayPressed();
-                } else {
-                  controller.value.isPlaying ? controller.pause() : controller.play();
-                }
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Icon(Icons.skip_previous),
+        GestureDetector(
+          onTap: () {
+            if (isVideoEnded) {
+              onReplayPressed();
+            } else {
+              controller.value.isPlaying ? controller.pause() : controller.play();
+            }
+          },
+          child: AnimatedSwitcher(
+            duration: Duration(milliseconds: 100),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return ScaleTransition(scale: animation, child: child);
             },
-            child: AnimatedSwitcher(
-                duration: Duration(milliseconds: 100),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return ScaleTransition(scale: animation, child: child,);
-                },
-                child: Icon(
-                  isVideoEnded ?
-                  Icons.replay :
-                  controller.value.isPlaying ?
-                  Icons.pause : Icons.play_arrow,
-                  key: ValueKey<String>(
-                    isVideoEnded ? 'replay' :
-                    controller.value.isPlaying ?
-                    'pause' : 'play',
-                  ),
-                )
+            child: Icon(
+              isVideoEnded ? Icons.replay : controller.value.isPlaying ?
+              Icons.pause : Icons.play_arrow,
+              key: ValueKey<String>(
+                isVideoEnded ? 'replay' : controller.value.isPlaying ?
+                'pause' : 'play',
+              ),
             ),
           ),
-          Icon(Icons.skip_next),
-        ],
-      );
+        ),
+        Icon(Icons.skip_next),
+      ],
+    );
   }
 }
