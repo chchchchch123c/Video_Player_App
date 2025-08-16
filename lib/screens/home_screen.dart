@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     videoPlayerController = VideoPlayerController.asset(
-      'assets/videos/Never_Gonna_Give_You_Up.mp4'
+      'assets/videos/(720p)Never_Gonna_Give_You_Up.mp4'
     )
     // videoPlayerController = VideoPlayerController.networkUrl(
     //     Uri.parse(rickRoll))
