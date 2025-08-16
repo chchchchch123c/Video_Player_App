@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:video_play_app/widgets/player_controls/components/play_pause_button.dart';
+import 'package:video_play_app/widgets/player_controls/components/play_button.dart';
 import 'package:video_play_app/widgets/player_controls/components/ripple_zone.dart';
 import 'package:video_play_app/widgets/player_controls/components/seek_slider.dart';
 import 'package:video_player/video_player.dart';
@@ -33,12 +33,17 @@ class VideoView extends StatelessWidget {
             ),
           ),
           Positioned(
-            left: 5,
-            right: 0,
+            left: -6,
+            right: 12,
             bottom: 0,
             child: SeekSlider(controller: controller),
           ),
-          PlayPauseButton(
+          Positioned(
+            bottom: 0,
+            right: -6,
+            child: IconButton(onPressed: () {}, icon: Icon(Icons.fullscreen)),
+          ),
+          PlayButton(
             controller: controller,
             isVideoEnded: isVideoEnded,
             onReplayPressed: onEndReset,
