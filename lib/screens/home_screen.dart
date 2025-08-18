@@ -1,67 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:video_play_app/constant/color.dart';
+import 'package:video_play_app/screens/home_screen_controller.dart';
 import 'package:video_play_app/widgets/player_controls/video_view.dart';
 import 'package:video_player/video_player.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final HomeScreenController controller;
+
+  const HomeScreen({super.key, required this.controller});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late VideoPlayerController videoPlayerController;
-  bool isVideoEnded = false;
-  bool isShow = true;
 
   @override
   void initState() {
     super.initState();
-    videoPlayerController = VideoPlayerController.asset(
+    widget.controller.videoPlayerController = VideoPlayerController.asset(
       'assets/videos/(720p)Old_Town_Road.mp4'
     )..initialize().then((_) {
         setState(() {});
       },);
 
-    videoPlayerController.addListener(() {
+    widget.controller.videoPlayerController.addListener(() {
       if (!mounted) return;
 
-      final controller = videoPlayerController;
+      final controller = widget.controller.videoPlayerController;
       final isEnded = controller.value.position >= controller.value.duration;
 
       setState(() {
-        isVideoEnded = isEnded;
+        widget.controller.isVideoEnded = isEnded;
       });
     },);
   }
 
   @override
   void dispose() {
-    videoPlayerController.dispose();
+    widget.controller.hideTimer?.cancel();
+    widget.controller.videoPlayerController.dispose();
     super.dispose();
   }
 
-  void onEndReset() {
-    setState(() {
-      isVideoEnded = false;
-    });
-    videoPlayerController.seekTo(Duration.zero);
-    videoPlayerController.play();
-  }
-
-  void onShowTap() {
-    setState(() {
-      isShow = !isShow;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: kBlack,
       body: Center(
-        child: videoPlayerController.value.isInitialized ?
+        child: widget.controller.videoPlayerController.value.isInitialized ?
          _body() : _placeHolder(),
       ),
     );
@@ -69,11 +58,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _body() {
     return VideoView(
-      controller: videoPlayerController,
-      isVideoEnded: isVideoEnded,
-      onEndReset: onEndReset,
-      onShowTap: onShowTap,
-      isShow: isShow,
+      controller: widget.controller.videoPlayerController,
+      isVideoEnded: widget.controller.isVideoEnded,
+      onEndReset: widget.controller.onEndReset,
+      onShowTap: widget.controller.onShowTap,
+      isShow: widget.controller.isShow,
+      onPlayPressed: widget.controller.onPlayPressed,
+      onForceHide: widget.controller.onForceHide,
+      onLongPress: widget.controller.onSetDoubleSpeed,
+      onLongPressEnd: widget.controller.onSetDefaultSpeed,
+      isiDoubleSpeed: widget.controller.isDoubleSpeed,
+      onFullScreenToggle: widget.controller.onFullScreenToggle,
       );
   }
 
