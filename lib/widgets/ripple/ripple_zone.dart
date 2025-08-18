@@ -6,10 +6,21 @@ import 'package:video_player/video_player.dart';
 
 class RippleZone extends StatefulWidget {
   final VideoPlayerController controller;
+  final bool isShow;
+  final VoidCallback onForceHide;
+  final VoidCallback onLongPress;
+  final void Function(LongPressEndDetails) onLongPressEnd;
 
   /// 영상 좌우 더블탭 영역을 감싸는 위젯.
   /// 왼쪽/오른쪽 더블탭 시 각각 5초 되감기 / 빨리감기를 처리함.
-  const RippleZone({super.key, required this.controller});
+  const RippleZone({
+    super.key,
+    required this.controller,
+    required this.isShow,
+    required this.onForceHide,
+    required this.onLongPress,
+    required this.onLongPressEnd,
+  });
 
   @override
   State<RippleZone> createState() => _RippleZoneState();
@@ -19,6 +30,11 @@ class _RippleZoneState extends State<RippleZone> {
   bool? _showIconLeft;
 
   void _onDoubleTap(bool isLeft) {
+
+    if (widget.isShow) {
+      widget.onForceHide();
+    }
+
     final current = widget.controller.value.position;
     final max = widget.controller.value.duration;
 
@@ -52,12 +68,16 @@ class _RippleZoneState extends State<RippleZone> {
             children: [
               Expanded(
                 child: CustomRippleZone(
+                  onLongPressEnd: widget.onLongPressEnd,
+                  onLongPress: widget.onLongPress,
                   isLeft: true,
                   onDoubleTap: () => _onDoubleTap(true),
                 ),
               ),
               Expanded(
                 child: CustomRippleZone(
+                  onLongPressEnd: widget.onLongPressEnd,
+                  onLongPress: widget.onLongPress,
                   isLeft: false,
                   onDoubleTap: () => _onDoubleTap(false),
                 ),
