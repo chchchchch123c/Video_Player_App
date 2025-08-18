@@ -33,7 +33,7 @@ class HomeScreenController extends ChangeNotifier {
 
   // UI 자동 숨김
   void _startHideTimer() {
-    hideTimer = Timer(Duration(seconds: 2), () {
+    hideTimer = Timer(Duration(milliseconds: 2600), () {
       if (videoPlayerController.value.isPlaying) {
         isShow = false;
         notifyListeners();
@@ -82,6 +82,7 @@ class HomeScreenController extends ChangeNotifier {
     videoPlayerController.setPlaybackSpeed(1.0);
   }
 
+  // 전체화면 전환
   void onFullScreenToggle() {
     isFullScreen = !isFullScreen;
     notifyListeners();
