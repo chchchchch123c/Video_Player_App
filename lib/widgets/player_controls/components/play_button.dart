@@ -6,6 +6,7 @@ class PlayButton extends StatelessWidget {
   final bool isVideoEnded;
   final VoidCallback onReplayPressed;
   final bool isShow;
+  final VoidCallback onPlayPressed;
 
   /// 재생 / 일시정지 / 리플레이 버튼 위젯.
   /// 영상 상태에 따라 아이콘이 변경되며, 눌렀을 때 동작 처리도 포함.
@@ -15,13 +16,14 @@ class PlayButton extends StatelessWidget {
     required this.isVideoEnded,
     required this.onReplayPressed,
     required this.isShow,
+    required this.onPlayPressed,
   });
 
   void _handlePlayOrReplay() {
     if (isVideoEnded) {
       onReplayPressed();
     } else {
-      controller.value.isPlaying ? controller.pause() : controller.play();
+      onPlayPressed();
     }
   }
 
