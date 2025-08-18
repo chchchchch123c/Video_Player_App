@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:video_play_app/widgets/player_controls/components/dimmed_overlay.dart';
+import 'package:video_play_app/widgets/player_controls/components/double_speed_banner.dart';
 import 'package:video_play_app/widgets/player_controls/components/orientation_button.dart';
 import 'package:video_play_app/widgets/player_controls/components/play_button.dart';
 import 'package:video_play_app/widgets/ripple/ripple_zone.dart';
@@ -13,6 +16,12 @@ class VideoView extends StatelessWidget {
   final VoidCallback onEndReset;
   final bool isShow;
   final VoidCallback onShowTap;
+  final VoidCallback onPlayPressed;
+  final VoidCallback onForceHide;
+  final VoidCallback onLongPress;
+  final void Function(LongPressEndDetails) onLongPressEnd;
+  final bool isiDoubleSpeed;
+  final VoidCallback onFullScreenToggle;
 
   /// 영상 플레이어 전체 UI를 구성하는 위젯.
   /// 실제 영상 출력, 제스처 영역, 슬라이더, 재생 버튼 등을 포함함.
@@ -23,6 +32,12 @@ class VideoView extends StatelessWidget {
     required this.onEndReset,
     required this.isShow,
     required this.onShowTap,
+    required this.onPlayPressed,
+    required this.onForceHide,
+    required this.onLongPress,
+    required this.onLongPressEnd,
+    required this.isiDoubleSpeed,
+    required this.onFullScreenToggle,
   });
 
   @override
@@ -36,7 +51,17 @@ class VideoView extends StatelessWidget {
           children: [
             VideoPlayer(controller),
             DimmedOverlay(isShow: isShow),
-            RippleZone(controller: controller),
+            RippleZone(
+              controller: controller,
+              isShow: isShow,
+              onForceHide: onForceHide,
+              onLongPress: onLongPress,
+              onLongPressEnd: onLongPressEnd,
+            ),
+            Positioned(
+              top: 0,
+              child: DoubleSpeedBanner(isVisible: isiDoubleSpeed),
+            ),
             Positioned(
               bottom: 32,
               left: 18,
@@ -51,13 +76,14 @@ class VideoView extends StatelessWidget {
             Positioned(
               bottom: 0,
               right: -6,
-              child: OrientationButton(isShow: isShow),
+              child: OrientationButton(isShow: isShow, onFullScreenToggle: onFullScreenToggle,),
             ),
             PlayButton(
               controller: controller,
               isVideoEnded: isVideoEnded,
               onReplayPressed: onEndReset,
               isShow: isShow,
+              onPlayPressed: onPlayPressed,
             ),
           ],
         ),
