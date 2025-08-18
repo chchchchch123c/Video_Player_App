@@ -4,6 +4,8 @@ import 'package:video_play_app/widgets/ripple/ripple_painter.dart';
 class CustomRippleZone extends StatefulWidget {
   final bool isLeft;
   final VoidCallback onDoubleTap;
+  final VoidCallback onLongPress;
+  final void Function(LongPressEndDetails) onLongPressEnd;
 
   /// 더블탭 시 원형 리플 애니메이션을 보여주는 위젯.
   /// 제스처를 인식하고 내부에서 [RipplePainter]로 효과를 그림.
@@ -11,6 +13,8 @@ class CustomRippleZone extends StatefulWidget {
     super.key,
     required this.isLeft,
     required this.onDoubleTap,
+    required this.onLongPress,
+    required this.onLongPressEnd,
   });
 
   @override
@@ -61,6 +65,8 @@ class _CustomRippleZoneState extends State<CustomRippleZone>
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onDoubleTapDown: (details) => _startRipple(details, size),
+          onLongPress: widget.onLongPress,
+          onLongPressEnd: widget.onLongPressEnd,
           child: AnimatedBuilder(
             animation: _animation,
             builder: (context, child) {
