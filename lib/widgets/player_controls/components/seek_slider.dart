@@ -21,7 +21,7 @@ class SeekSlider extends StatelessWidget {
         child: SliderTheme(
           data: SliderThemeData(
             thumbShape: HandleThumbShape(),
-            thumbSize: WidgetStateProperty.all(Size(15, 15))
+            thumbSize: WidgetStateProperty.all(Size(12, 12))
           ),
           child: Slider(
             thumbColor: kIndigoAccent,
