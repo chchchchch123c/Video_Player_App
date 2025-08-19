@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_play_app/constant/color.dart';
 
 class DoubleSpeedBanner extends StatelessWidget {
   final bool isVisible;
@@ -15,7 +16,7 @@ class DoubleSpeedBanner extends StatelessWidget {
         child: OutlinedButton(
           onPressed: null,
           style: OutlinedButton.styleFrom(
-            backgroundColor: Colors.black.withOpacity(0.5),
+            backgroundColor: kHalfBlack,
             minimumSize: Size.zero,
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
           ),
