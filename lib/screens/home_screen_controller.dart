@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
+import '../widgets/player_controls/components/setting_dialog.dart';
+
 class HomeScreenController extends ChangeNotifier {
   late final VideoPlayerController videoPlayerController;
   bool isVideoEnded = false;
@@ -101,6 +103,22 @@ class HomeScreenController extends ChangeNotifier {
       ]);
     }
 
+  }
+
+  Future<bool> onWillPop() async {
+    if (isFullScreen) {
+      onFullScreenToggle();
+      return false;
+    }
+    return true;
+  }
+
+  Future onSettingPress(BuildContext context) {
+    return showDialog(
+      barrierColor: Colors.transparent,
+      builder: (context) => SettingDialog(),
+      context: context
+    );
   }
 
 }
