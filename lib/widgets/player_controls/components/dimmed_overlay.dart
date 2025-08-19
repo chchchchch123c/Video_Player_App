@@ -16,7 +16,7 @@ class DimmedOverlay extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: double.infinity,
-        color: kBlack.withOpacity(0.5),
+        color: kHalfBlack,
       ),
     );
   }
