@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     widget.controller.addListener(updateScreen);
     widget.controller.videoPlayerController = VideoPlayerController.asset(
-      'assets/videos/(720p)Never_Gonna_Give_You_Up.mp4'
+      'assets/videos/(720p)Old_Town_Road.mp4'
     )..initialize().then((_) {
         setState(() {});
       },);
@@ -49,20 +49,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void onSettingPress() {
-    showDialog(context: context, builder: (context) => AlertDialog(
-      title: Text('data'),
-      content: Text('data'),
-    ),);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBlack,
-      body: Center(
-        child: widget.controller.videoPlayerController.value.isInitialized ?
-         _body() : _placeHolder(),
+    return WillPopScope(
+      onWillPop: widget.controller.onWillPop,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: kBlack,
+        body: Center(
+          child: widget.controller.videoPlayerController.value.isInitialized ?
+           _body() : _placeHolder(),
+        ),
       ),
     );
   }
@@ -80,7 +77,9 @@ class _HomeScreenState extends State<HomeScreen> {
       onLongPressEnd: widget.controller.onSetDefaultSpeed,
       isiDoubleSpeed: widget.controller.isDoubleSpeed,
       onFullScreenToggle: widget.controller.onFullScreenToggle,
-      onSettingPress: onSettingPress,
+      onSettingPress: () {
+        widget.controller.onSettingPress(context);
+      },
       );
   }
 
