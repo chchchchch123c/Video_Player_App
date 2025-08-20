@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
-import '../widgets/player_controls/components/setting_dialog.dart';
+import '../widgets/player_controls/components/setting/setting_dialog.dart';
 
 class HomeScreenController extends ChangeNotifier {
   late final VideoPlayerController videoPlayerController;
@@ -12,7 +12,7 @@ class HomeScreenController extends ChangeNotifier {
   Timer? hideTimer;
   bool isDoubleSpeed = false;
   bool isFullScreen = false;
-
+  bool isLoop = false;
 
   // 영상 끝난 후 리셋
   void onEndReset() {
@@ -116,9 +116,25 @@ class HomeScreenController extends ChangeNotifier {
   Future onSettingPress(BuildContext context) {
     return showDialog(
       barrierColor: Colors.transparent,
-      builder: (context) => SettingDialog(),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return SettingDialog(
+            controller: videoPlayerController,
+            isLoop: isLoop,
+            onTapSpeed: () {},
+            onTapLoop: () => _onTapLoop(() => setState(() {})),
+          );
+        }
+      ),
       context: context
     );
+  }
+
+  void _onTapLoop(VoidCallback setState) {
+    isLoop = !isLoop;
+    videoPlayerController.setLooping(isLoop);
+    notifyListeners();
+    setState();
   }
 
 }
