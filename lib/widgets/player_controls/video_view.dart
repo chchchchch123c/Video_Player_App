@@ -3,7 +3,7 @@ import 'package:video_play_app/widgets/player_controls/components/dimmed_overlay
 import 'package:video_play_app/widgets/player_controls/components/double_speed_banner.dart';
 import 'package:video_play_app/widgets/player_controls/components/orientation_button.dart';
 import 'package:video_play_app/widgets/player_controls/components/play_button.dart';
-import 'package:video_play_app/widgets/player_controls/components/setting_button.dart';
+import 'package:video_play_app/widgets/player_controls/components/setting/setting_button.dart';
 import 'package:video_play_app/widgets/ripple/ripple_zone.dart';
 import 'package:video_play_app/widgets/player_controls/components/seek_slider.dart';
 import 'package:video_play_app/widgets/player_controls/components/time_indicator.dart';
