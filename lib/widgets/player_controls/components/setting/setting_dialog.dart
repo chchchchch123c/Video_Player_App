@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_play_app/constant/color.dart';
+import 'package:video_play_app/widgets/player_controls/components/setting/play_back_speed_list.dart';
 import 'package:video_play_app/widgets/player_controls/components/setting/setting_list.dart';
 import 'package:video_player/video_player.dart';
 
@@ -64,78 +65,3 @@ class SettingDialog extends StatelessWidget {
     );
   }
 }
-
-class PlayBackSpeedList extends StatelessWidget {
-  final List<double> speeds;
-  final int selectedIndex;
-  final ValueChanged<int> onSelect;
-
-  const PlayBackSpeedList({
-    super.key,
-    required this.speeds,
-    required this.selectedIndex,
-    required this.onSelect,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      mainAxisSize: MainAxisSize.min,
-      children: speeds.asMap().entries.map((e) {
-        final index = e.key;
-        final value = e.value;
-        return PlayBackSpeedItem(
-          index: index,
-          selectedIndex: selectedIndex,
-          playBackSpeedText: value.toString(),
-          onSelect: onSelect,
-        );
-      },).toList(),
-    );
-  }
-}
-
-class PlayBackSpeedItem extends StatelessWidget {
-  final int index;
-  final int selectedIndex;
-  final String playBackSpeedText;
-  final ValueChanged<int> onSelect;
-
-  const PlayBackSpeedItem({
-    super.key,
-    required this.index,
-    required this.selectedIndex,
-    required this.playBackSpeedText,
-    required this.onSelect,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => onSelect(index),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(right: 4),
-                child: Icon(
-                  selectedIndex == index ? Icons.check : null,
-                  size: 20,
-                ),
-              ),
-              Text(
-                playBackSpeedText,
-                style: TextStyle(color: Colors.white,),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
