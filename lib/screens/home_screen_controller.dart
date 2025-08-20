@@ -13,6 +13,8 @@ class HomeScreenController extends ChangeNotifier {
   bool isDoubleSpeed = false;
   bool isFullScreen = false;
   bool isLoop = false;
+  bool isExtended = false;
+  int playbackIndex = 2;
 
   // 영상 끝난 후 리셋
   void onEndReset() {
@@ -118,16 +120,33 @@ class HomeScreenController extends ChangeNotifier {
       barrierColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
+          final speeds = <double> [2.0, 1.5, 1.0, 0.5];
           return SettingDialog(
+            speeds: speeds,
+            playbackIndex: playbackIndex,
             controller: videoPlayerController,
+            isExtended: isExtended,
             isLoop: isLoop,
-            onTapSpeed: () {},
+            onTapSpeed: () => _onTapExtends(() => setState(() {}),),
             onTapLoop: () => _onTapLoop(() => setState(() {})),
+            onSelectSpeed: (index) {
+              playbackIndex = index;
+              isExtended = false;
+              videoPlayerController.setPlaybackSpeed(speeds[index]);
+              notifyListeners();
+              setState(() {});
+            },
           );
         }
       ),
       context: context
     );
+  }
+
+  void _onTapExtends(VoidCallback setState) {
+    isExtended = true;
+    notifyListeners();
+    setState();
   }
 
   void _onTapLoop(VoidCallback setState) {
