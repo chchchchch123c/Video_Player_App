@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_play_app/constant/color.dart';
+import 'package:video_play_app/widgets/player_controls/components/setting/setting_list.dart';
 import 'package:video_player/video_player.dart';
 
 class SettingDialog extends StatelessWidget {
@@ -7,6 +8,10 @@ class SettingDialog extends StatelessWidget {
   final bool isLoop;
   final VoidCallback onTapSpeed;
   final VoidCallback onTapLoop;
+  final bool isExtended;
+  final List<double> speeds;
+  final ValueChanged<int> onSelectSpeed;
+  final int playbackIndex;
 
   const SettingDialog({
     super.key,
@@ -14,6 +19,10 @@ class SettingDialog extends StatelessWidget {
     required this.isLoop,
     required this.onTapSpeed,
     required this.onTapLoop,
+    required this.isExtended,
+    required this.speeds,
+    required this.onSelectSpeed,
+    required this.playbackIndex,
   });
 
   @override
@@ -27,45 +36,28 @@ class SettingDialog extends StatelessWidget {
         right: mediaWidth * 0.07,
         left: mediaQuery.orientation == Orientation.landscape ?
         mediaWidth * 0.65 : mediaWidth * 0.55,
-        bottom: mediaWidth * 0.3,
+        bottom: isExtended ? mediaWidth * 0.15 : mediaWidth * 0.3,
       ),
       child: Container(
-        height: 70,
+        height: isExtended ? 120 : 64,
         decoration: BoxDecoration(
           color: kEightyBlack,
           borderRadius: BorderRadius.all(Radius.circular(6)),
         ),
         child: Padding(
           padding: EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SettingItem(
-                onSettingItemTap: onTapSpeed,
-                icon: Icons.slow_motion_video,
-                label: 'speed',
-                itemButton: Row(
-                  children: [
-                    Text(
-                      controller.value.playbackSpeed.toString(),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Icon(Icons.keyboard_arrow_right, size: 20,),
-                  ],
-                ),
-              ),
-              SettingItem(
-                onSettingItemTap: onTapLoop,
-                icon: Icons.repeat,
-                label: 'loop',
-                itemButton: Icon(
-                  isLoop ? Icons.check : null,
-                  size: 20,
-                ),
-              ),
-            ],
+          child: isExtended ?
+          PlayBackSpeedList(
+            speeds: speeds,
+            selectedIndex: playbackIndex,
+            onSelect: onSelectSpeed,
+          ) :
+          SettingList(
+            controller: controller,
+            isLoop: isLoop,
+            onTapSpeed: onTapSpeed,
+            onTapLoop: onTapLoop,
+            isExtended: isExtended,
           ),
         ),
       ),
@@ -73,24 +65,56 @@ class SettingDialog extends StatelessWidget {
   }
 }
 
-class SettingItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Widget itemButton;
-  final VoidCallback onSettingItemTap;
+class PlayBackSpeedList extends StatelessWidget {
+  final List<double> speeds;
+  final int selectedIndex;
+  final ValueChanged<int> onSelect;
 
-  const SettingItem({
+  const PlayBackSpeedList({
     super.key,
-    required this.icon,
-    required this.label,
-    required this.itemButton,
-    required this.onSettingItemTap,
+    required this.speeds,
+    required this.selectedIndex,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.min,
+      children: speeds.asMap().entries.map((e) {
+        final index = e.key;
+        final value = e.value;
+        return PlayBackSpeedItem(
+          index: index,
+          selectedIndex: selectedIndex,
+          playBackSpeedText: value.toString(),
+          onSelect: onSelect,
+        );
+      },).toList(),
+    );
+  }
+}
+
+class PlayBackSpeedItem extends StatelessWidget {
+  final int index;
+  final int selectedIndex;
+  final String playBackSpeedText;
+  final ValueChanged<int> onSelect;
+
+  const PlayBackSpeedItem({
+    super.key,
+    required this.index,
+    required this.selectedIndex,
+    required this.playBackSpeedText,
+    required this.onSelect,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onSettingItemTap,
+      onTap: () => onSelect(index),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -98,12 +122,17 @@ class SettingItem extends StatelessWidget {
             children: [
               Padding(
                 padding: EdgeInsets.only(right: 4),
-                child: Icon(icon, size: 20,),
+                child: Icon(
+                  selectedIndex == index ? Icons.check : null,
+                  size: 20,
+                ),
               ),
-              Text(label, style: TextStyle(color: Colors.white),),
+              Text(
+                playBackSpeedText,
+                style: TextStyle(color: Colors.white,),
+              ),
             ],
           ),
-          itemButton,
         ],
       ),
     );
