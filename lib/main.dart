@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_play_app/constant/color.dart';
-import 'package:video_play_app/screens/home_screen.dart';
-import 'package:video_play_app/screens/home_screen_controller.dart';
+import 'package:video_play_app/presentations/controllers/select_video_controller.dart';
+import 'package:video_play_app/presentations/screens/select_video_screen.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -10,6 +10,6 @@ void main() {
         color: kWhite,
       ),
     ),
-    home: HomeScreen(controller: HomeScreenController(),),
+    home: SelectVideoScreen(controller: SelectVideoController(),),
   ));
 }
