@@ -1,13 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:video_play_app/constant/color.dart';
-import 'package:video_play_app/screens/home_screen_controller.dart';
+import 'package:video_play_app/presentations/controllers/home_screen_controller.dart';
 import 'package:video_play_app/widgets/player_controls/video_view.dart';
 import 'package:video_player/video_player.dart';
 
 class HomeScreen extends StatefulWidget {
   final HomeScreenController controller;
+  final XFile? pickedVideo;
 
-  const HomeScreen({super.key, required this.controller});
+  const HomeScreen({
+    super.key,
+    required this.controller,
+    required this.pickedVideo,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -23,8 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     widget.controller.addListener(updateScreen);
-    widget.controller.videoPlayerController = VideoPlayerController.asset(
-      'assets/videos/(720p)Old_Town_Road.mp4'
+    widget.controller.videoPlayerController = VideoPlayerController.file(
+      File(widget.pickedVideo!.path)
     )..initialize().then((_) {
         setState(() {});
       },);
