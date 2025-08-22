@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:video_play_app/widgets/player_controls/components/setting/setting_dialog.dart';
 import 'package:video_player/video_player.dart';
-
-import '../widgets/player_controls/components/setting/setting_dialog.dart';
 
 class HomeScreenController extends ChangeNotifier {
   late final VideoPlayerController videoPlayerController;
@@ -115,32 +114,39 @@ class HomeScreenController extends ChangeNotifier {
     return true;
   }
 
-  Future onSettingPress(BuildContext context) {
-    return showDialog(
-      barrierColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          final speeds = <double> [2.0, 1.5, 1.0, 0.5];
-          return SettingDialog(
-            speeds: speeds,
-            playbackIndex: playbackIndex,
-            controller: videoPlayerController,
-            isExtended: isExtended,
-            isLoop: isLoop,
-            onTapSpeed: () => _onTapExtends(() => setState(() {}),),
-            onTapLoop: () => _onTapLoop(() => setState(() {})),
-            onSelectSpeed: (index) {
-              playbackIndex = index;
-              isExtended = false;
-              videoPlayerController.setPlaybackSpeed(speeds[index]);
-              notifyListeners();
-              setState(() {});
-            },
-          );
-        }
-      ),
-      context: context
-    );
+  Future<void> onSettingPress(BuildContext context) async {
+    try {
+      return await showDialog(
+        barrierColor: Colors.transparent,
+        builder: (context) => StatefulBuilder(
+          builder: (context, setState) {
+            final speeds = <double> [2.0, 1.5, 1.0, 0.5];
+            return SettingDialog(
+              speeds: speeds,
+              playbackIndex: playbackIndex,
+              controller: videoPlayerController,
+              isExtended: isExtended,
+              isLoop: isLoop,
+              onTapSpeed: () => _onTapExtends(() => setState(() {}),),
+              onTapLoop: () => _onTapLoop(() => setState(() {})),
+              onSelectSpeed: (index) {
+                playbackIndex = index;
+                isExtended = false;
+                videoPlayerController.setPlaybackSpeed(speeds[index]);
+                notifyListeners();
+                setState(() {});
+              },
+            );
+          }
+        ),
+        context: context
+      );
+    } finally {
+      if (isExtended) {
+        isExtended = false;
+        notifyListeners();
+      }
+    }
   }
 
   void _onTapExtends(VoidCallback setState) {
