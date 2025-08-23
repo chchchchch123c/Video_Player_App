@@ -24,8 +24,8 @@ class SelectVideoScreen extends StatelessWidget {
                   height: 56.0,
                   icon: Icons.help_outline,
                   text: 'How to use',
-                  onTap: () => showDialog(context: context, builder: (context) => AlertDialog(),),
-                  // TODO
+                  onTap: () => controller.urlLauncher(),
+                  // TODO 다이얼로그 추가 후 다이얼로그 안에서 호춯하기
                 ),
               ),
               Expanded(
