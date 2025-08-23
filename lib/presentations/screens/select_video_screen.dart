@@ -10,33 +10,35 @@ class SelectVideoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kGray,
-      appBar: _AppBar(),
-      body: Padding(
-        padding: EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(bottom: 12),
-              child: SelectContainer(
-                height: 56.0,
-                icon: Icons.help_outline,
-                text: 'How to use',
-                onTap: () => showDialog(context: context, builder: (context) => AlertDialog(),),
-                // TODO
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: kGray,
+        appBar: _AppBar(),
+        body: Padding(
+          padding: EdgeInsets.all(12),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: SelectContainer(
+                  height: 56.0,
+                  icon: Icons.help_outline,
+                  text: 'How to use',
+                  onTap: () => showDialog(context: context, builder: (context) => AlertDialog(),),
+                  // TODO
+                ),
               ),
-            ),
-            Expanded(
-              child: SelectContainer(
-                icon: Icons.add_photo_alternate_outlined,
-                text: 'Load a video',
-                onTap: () {
-                  controller.pickVideo(context);
-                },
+              Expanded(
+                child: SelectContainer(
+                  icon: Icons.add_photo_alternate_outlined,
+                  text: 'Load a video',
+                  onTap: () {
+                    controller.pickVideo(context);
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
