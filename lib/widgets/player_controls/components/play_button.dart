@@ -7,9 +7,11 @@ class PlayButton extends StatelessWidget {
   final VoidCallback onReplayPressed;
   final bool isShow;
   final VoidCallback onPlayPressed;
+  final VoidCallback onSkipPrevious;
+  final VoidCallback onSkipNext;
+  final bool canSkipPrev;
+  final bool canSkipNext;
 
-  /// 재생 / 일시정지 / 리플레이 버튼 위젯.
-  /// 영상 상태에 따라 아이콘이 변경되며, 눌렀을 때 동작 처리도 포함.
   const PlayButton({
     super.key,
     required this.controller,
@@ -17,6 +19,10 @@ class PlayButton extends StatelessWidget {
     required this.onReplayPressed,
     required this.isShow,
     required this.onPlayPressed,
+    required this.onSkipPrevious,
+    required this.onSkipNext,
+    required this.canSkipPrev,
+    required this.canSkipNext,
   });
 
   void _handlePlayOrReplay() {
@@ -58,9 +64,7 @@ class PlayButton extends StatelessWidget {
 
   Widget _skipPrevious() {
     return IconButton(
-      onPressed: () {
-        // TODO
-      },
+      onPressed: canSkipPrev ? onSkipPrevious : null,
       icon: Icon(Icons.skip_previous),
     );
   }
@@ -81,9 +85,7 @@ class PlayButton extends StatelessWidget {
 
   Widget _skipNext() {
     return IconButton(
-      onPressed: () {
-        // TODO
-      },
+      onPressed: canSkipNext ? onSkipNext : null,
       icon: Icon(Icons.skip_next),
     );
   }
