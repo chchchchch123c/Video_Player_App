@@ -24,7 +24,7 @@ class SelectVideoScreen extends StatelessWidget {
                   height: 56.0,
                   icon: Icons.help_outline,
                   text: 'How to use',
-                  onTap: () => controller.urlLauncher(),
+                  onTap: () => controller.onHelpTap(context),
                   // TODO 다이얼로그 추가 후 다이얼로그 안에서 호춯하기
                 ),
               ),
@@ -33,7 +33,7 @@ class SelectVideoScreen extends StatelessWidget {
                   icon: Icons.add_photo_alternate_outlined,
                   text: 'Load a video',
                   onTap: () {
-                    controller.pickVideo(context);
+                    controller.pickMultipleVideos(context);
                   },
                 ),
               ),
@@ -51,7 +51,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget{
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: kIndigoAccent,
-      title: Text('VideoPlayerApp'),
+      title: const Text('VideoPlayerApp'),
       titleTextStyle: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w700,
