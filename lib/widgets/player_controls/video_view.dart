@@ -22,9 +22,12 @@ class VideoView extends StatelessWidget {
   final bool isiDoubleSpeed;
   final VoidCallback onFullScreenToggle;
   final VoidCallback onSettingPress;
+  final VoidCallback onSkipPrevious;
+  final VoidCallback onSkipNext;
+  final bool canSkipPrev;
+  final bool canSkipNext;
+  final bool showVideoLayer;
 
-  /// 영상 플레이어 전체 UI를 구성하는 위젯.
-  /// 실제 영상 출력, 제스처 영역, 슬라이더, 재생 버튼 등을 포함함.
   const VideoView({
     super.key,
     required this.controller,
@@ -39,18 +42,32 @@ class VideoView extends StatelessWidget {
     required this.isiDoubleSpeed,
     required this.onFullScreenToggle,
     required this.onSettingPress,
+    required this.onSkipPrevious,
+    required this.onSkipNext,
+    required this.canSkipPrev,
+    required this.canSkipNext,
+    required this.showVideoLayer,
   });
 
   @override
   Widget build(BuildContext context) {
+    final initialized = controller.value.isInitialized;
+    final aspect = initialized ? controller.value.aspectRatio : (16 / 9);
+
     return GestureDetector(
       onTap: onShowTap,
       child: AspectRatio(
-        aspectRatio: controller.value.aspectRatio,
+        aspectRatio: aspect,
         child: Stack(
           alignment: Alignment.center,
           children: [
-            VideoPlayer(controller),
+            if (showVideoLayer && initialized)
+              VideoPlayer(
+                controller,
+                key: ValueKey(controller),
+              )
+            else
+              const ColoredBox(color: Colors.black),
             DimmedOverlay(isShow: isShow),
             RippleZone(
               controller: controller,
@@ -94,6 +111,10 @@ class VideoView extends StatelessWidget {
               onReplayPressed: onEndReset,
               isShow: isShow,
               onPlayPressed: onPlayPressed,
+              onSkipPrevious: onSkipPrevious,
+              onSkipNext: onSkipNext,
+              canSkipPrev: canSkipPrev,
+              canSkipNext: canSkipNext,
             ),
             Positioned(
               top: 0,
