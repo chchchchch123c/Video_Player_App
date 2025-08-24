@@ -10,35 +10,32 @@ class SelectVideoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: kGray,
-        appBar: _AppBar(),
-        body: Padding(
-          padding: EdgeInsets.all(12),
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: SelectContainer(
-                  height: 56.0,
-                  icon: Icons.help_outline,
-                  text: 'How to use',
-                  onTap: () => controller.onHelpTap(context),
-                  // TODO 다이얼로그 추가 후 다이얼로그 안에서 호춯하기
-                ),
+    return Scaffold(
+      backgroundColor: kGray,
+      appBar: _AppBar(),
+      body: Padding(
+        padding: EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: SelectContainer(
+                height: 56.0,
+                icon: Icons.help_outline,
+                text: 'How to use',
+                onTap: () => controller.onHelpTap(context),
               ),
-              Expanded(
-                child: SelectContainer(
-                  icon: Icons.add_photo_alternate_outlined,
-                  text: 'Load a video',
-                  onTap: () {
-                    controller.pickMultipleVideos(context);
-                  },
-                ),
+            ),
+            Expanded(
+              child: SelectContainer(
+                icon: Icons.add_photo_alternate_outlined,
+                text: 'Load a video',
+                onTap: () {
+                  controller.pickMultipleVideos(context);
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
