@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:video_play_app/widgets/player_controls/components/setting/setting_dialog.dart';
 import 'package:video_player/video_player.dart';
 
 class HomeScreenController extends ChangeNotifier {
-  late final VideoPlayerController videoPlayerController;
+  late VideoPlayerController videoPlayerController;
+  VoidCallback? _valueListener;
+
   bool isVideoEnded = false;
   bool isShow = true;
   Timer? hideTimer;
@@ -14,8 +18,55 @@ class HomeScreenController extends ChangeNotifier {
   bool isLoop = false;
   bool isExtended = false;
   int playbackIndex = 2;
+  List<XFile> videoList = [];
+  int currentVideoIndex = 0;
 
-  // 영상 끝난 후 리셋
+  bool showVideoLayer = true;
+
+  Future<void> initAndPlay(String src) async {
+    showVideoLayer = false;
+    notifyListeners();
+
+    try {
+      videoPlayerController.pause();
+      if (_valueListener != null) {
+        videoPlayerController.removeListener(_valueListener!);
+      }
+      await videoPlayerController.dispose();
+    } catch (_) {}
+
+    final bool isContentUri = src.startsWith('content://');
+    final VideoPlayerController next = isContentUri
+        ? VideoPlayerController.contentUri(Uri.parse(src))
+        : VideoPlayerController.file(File(src));
+
+    videoPlayerController = next;
+
+    await videoPlayerController.initialize();
+    isVideoEnded = false;
+
+    _attachVideoListener();
+    await videoPlayerController.play();
+
+    showVideoLayer = true;
+    notifyListeners();
+  }
+
+  void _attachVideoListener() {
+    if (_valueListener != null) {
+      videoPlayerController.removeListener(_valueListener!);
+    }
+    _valueListener = () {
+      final v = videoPlayerController.value;
+      final ended = v.isInitialized && v.position >= v.duration && !v.isPlaying;
+      if (isVideoEnded != ended) {
+        isVideoEnded = ended;
+        notifyListeners();
+      }
+    };
+    videoPlayerController.addListener(_valueListener!);
+  }
+
   void onEndReset() {
     isVideoEnded = false;
     notifyListeners();
@@ -23,10 +74,8 @@ class HomeScreenController extends ChangeNotifier {
     videoPlayerController.play();
   }
 
-  // 화면 탭 시 UI 토글 및 자동 숨김 타이머
   void onShowTap() {
     hideTimer?.cancel();
-
     isShow = !isShow;
     notifyListeners();
     if (videoPlayerController.value.isPlaying) {
@@ -34,20 +83,17 @@ class HomeScreenController extends ChangeNotifier {
     }
   }
 
-  // UI 자동 숨김
   void _startHideTimer() {
-    hideTimer = Timer(Duration(milliseconds: 2600), () {
+    hideTimer = Timer(const Duration(milliseconds: 2600), () {
       if (videoPlayerController.value.isPlaying) {
         isShow = false;
         notifyListeners();
       }
-    },);
+    });
   }
 
-  // 재생 버튼 클릭 시 동작 처리
   void onPlayPressed() {
     final isPlaying = videoPlayerController.value.isPlaying;
-
     if (isPlaying) {
       videoPlayerController.pause();
     } else {
@@ -60,36 +106,28 @@ class HomeScreenController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 더블 탭 시 UI 숨김
   void onForceHide() {
     isShow = false;
     notifyListeners();
   }
 
-
-  // 롱프레스 호출 시, UI가 보일 때만 2배속 적용하고 그 즉시 UI는 감춤
   void onSetDoubleSpeed() {
     if (!videoPlayerController.value.isPlaying) return;
-    if (isShow) {
-      onForceHide();
-    }
+    if (isShow) onForceHide();
     isDoubleSpeed = true;
     notifyListeners();
     videoPlayerController.setPlaybackSpeed(2.0);
   }
 
-  // 롱프레스가 끝날시 속도 정상화
   void onSetDefaultSpeed(LongPressEndDetails _) {
     isDoubleSpeed = false;
     notifyListeners();
     videoPlayerController.setPlaybackSpeed(1.0);
   }
 
-  // 전체화면 전환
   void onFullScreenToggle() {
     isFullScreen = !isFullScreen;
     notifyListeners();
-
     if (isFullScreen) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
       SystemChrome.setPreferredOrientations([
@@ -103,7 +141,6 @@ class HomeScreenController extends ChangeNotifier {
         DeviceOrientation.portraitDown,
       ]);
     }
-
   }
 
   Future<bool> onWillPop() async {
@@ -120,15 +157,19 @@ class HomeScreenController extends ChangeNotifier {
         barrierColor: Colors.transparent,
         builder: (context) => StatefulBuilder(
           builder: (context, setState) {
-            final speeds = <double> [2.0, 1.5, 1.0, 0.5];
+            final speeds = <double>[2.0, 1.5, 1.0, 0.5];
             return SettingDialog(
               speeds: speeds,
               playbackIndex: playbackIndex,
               controller: videoPlayerController,
               isExtended: isExtended,
               isLoop: isLoop,
-              onTapSpeed: () => _onTapExtends(() => setState(() {}),),
-              onTapLoop: () => _onTapLoop(() => setState(() {})),
+              onTapSpeed: () {
+                _onTapExtends(() => setState(() {}));
+              },
+              onTapLoop: () {
+                _onTapLoop(() => setState(() {}));
+              },
               onSelectSpeed: (index) {
                 playbackIndex = index;
                 isExtended = false;
@@ -137,9 +178,9 @@ class HomeScreenController extends ChangeNotifier {
                 setState(() {});
               },
             );
-          }
+          },
         ),
-        context: context
+        context: context,
       );
     } finally {
       if (isExtended) {
@@ -162,4 +203,31 @@ class HomeScreenController extends ChangeNotifier {
     setState();
   }
 
+  void setVideoList(List<XFile> videos, {int startIndex = 0}) {
+    videoList = videos;
+    currentVideoIndex =
+    (startIndex >= 0 && startIndex < videoList.length) ? startIndex : 0;
+    notifyListeners();
+  }
+
+  Future<void> playVideoAt(int index) async {
+    if (index < 0 || index >= videoList.length) {
+      return;
+    }
+    currentVideoIndex = index;
+    notifyListeners();
+    await initAndPlay(videoList[index].path);
+  }
+
+  void onSkipPrevious() {
+    if (currentVideoIndex > 0) {
+      playVideoAt(currentVideoIndex - 1);
+    }
+  }
+
+  void onSkipNext() {
+    if (currentVideoIndex < videoList.length - 1) {
+      playVideoAt(currentVideoIndex + 1);
+    }
+  }
 }
