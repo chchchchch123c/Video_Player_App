@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_play_app/constant/color.dart';
 import 'package:video_play_app/presentations/controllers/home_screen_controller.dart';
 import 'package:video_play_app/widgets/player_controls/video_view.dart';
-import 'package:video_player/video_player.dart';
 
 class HomeScreen extends StatefulWidget {
   final HomeScreenController controller;
@@ -22,57 +19,58 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   void updateScreen() {
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  bool get _isControllerInitializedSafe {
+    try {
+      return widget.controller.videoPlayerController.value.isInitialized;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(updateScreen);
-    widget.controller.videoPlayerController = VideoPlayerController.file(
-      File(widget.pickedVideo!.path)
-    )..initialize().then((_) {
-        setState(() {});
-      },);
-
-    widget.controller.videoPlayerController.addListener(() {
-      if (!mounted) return;
-
-      final controller = widget.controller.videoPlayerController;
-      final isEnded = controller.value.position >= controller.value.duration;
-
-      setState(() {
-        widget.controller.isVideoEnded = isEnded;
-      });
-    },);
+    if (widget.pickedVideo != null && !_isControllerInitializedSafe) {
+      widget.controller.initAndPlay(widget.pickedVideo!.path);
+    }
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(updateScreen);
     widget.controller.hideTimer?.cancel();
-    widget.controller.videoPlayerController.dispose();
+    try {
+      widget.controller.videoPlayerController.dispose();
+    } catch (_) {}
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final inited = _isControllerInitializedSafe;
     return WillPopScope(
       onWillPop: widget.controller.onWillPop,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         backgroundColor: kBlack,
         body: Center(
-          child: widget.controller.videoPlayerController.value.isInitialized ?
-           _body() : _placeHolder(),
+          child: inited ? _body() : _placeHolder(),
         ),
       ),
     );
   }
 
   Widget _body() {
+    final idx = widget.controller.currentVideoIndex;
+    final total = widget.controller.videoList.length;
+
     return VideoView(
       controller: widget.controller.videoPlayerController,
       isVideoEnded: widget.controller.isVideoEnded,
@@ -85,18 +83,21 @@ class _HomeScreenState extends State<HomeScreen> {
       onLongPressEnd: widget.controller.onSetDefaultSpeed,
       isiDoubleSpeed: widget.controller.isDoubleSpeed,
       onFullScreenToggle: widget.controller.onFullScreenToggle,
-      onSettingPress: () {
-        widget.controller.onSettingPress(context);
-      },
-      );
+      onSettingPress: () => widget.controller.onSettingPress(context),
+      onSkipPrevious: widget.controller.onSkipPrevious,
+      onSkipNext: widget.controller.onSkipNext,
+      canSkipPrev: idx > 0,
+      canSkipNext: idx < total - 1,
+      showVideoLayer: widget.controller.showVideoLayer,
+    );
   }
 
   Widget _placeHolder() {
     return AspectRatio(
       aspectRatio: 16 / 9,
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey,
+        decoration: const BoxDecoration(
+          color: kBlack,
           borderRadius: BorderRadius.all(Radius.circular(4)),
         ),
       ),
